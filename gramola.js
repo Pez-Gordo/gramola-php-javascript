@@ -1,10 +1,31 @@
+var canciones
+// Implementamos carga dinámica de archivos 
+$.ajax({
+	async: false,
+    url: './listado-archivos.php',
+    method: 'POST',
+    dataType: 'json',
+    success: function(response) {
+        console.log(response)
+        var songsArray = response
+        songsArray.shift()
+        songsArray.shift()
+        canciones = songsArray
+    }
+})
+
+
+
+
 
 //Array con el listado de canciones a mostrar en el reprodutor
+/*
 const canciones = [
 	"aaa.mp3",
 	"bbb.mp3",
 	"ccc.mp3"
 ]
+*/
 var indiceActual = new Array(1)
 //Funcion para crear mediante javascript el listado de canciones
 function crearPlayList(){
@@ -59,6 +80,7 @@ const updateProgress = () =>{
 		document.getElementById('timer').innerText=duracion 
 	}
 	if (player.ended){
+		// if(lista) {nextMusicList()} else
 		nextMusic();//Reproducir la siguiente pista
 	} 
 }
@@ -135,15 +157,15 @@ function togglePlay() {
 //Funcion para cambiar el icono play o pause
 function toggleIcon() {
    var element = document.getElementById("iconPlay");
-   element.classList.toggle("fa-pause-circle");
    element.classList.toggle("fa-play-circle");
+   element.classList.toggle("fa-pause-circle");
 }
 //Funcion para que al dar click sobre la barra de progeso se permita adelantar
 progress.addEventListener('click', adelantar);
 function adelantar(e){
 	const scrubTime = (e.offsetX / progress.offsetWidth) * player.duration;
 	player.currentTime = scrubTime;
-	sonsole.log(e);
+	console.log(e);
 }
 //Funcion para convertir segundos a minutos y horas
 function secondsToString(seconds) {
