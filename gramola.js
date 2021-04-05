@@ -47,7 +47,7 @@ function crearPlayList(){
 	}
 	return listado
 }
-document.getElementById('playList').appendChild(crearPlayList())
+document.getElementById('collection').appendChild(crearPlayList())
 
 
 var listadoMusica= document.getElementById('listadoMusica')
@@ -237,3 +237,25 @@ function drawVisualizer(bufferLength, x, barWidth, barHeight, dataArray) {
 		x += barWidth
 	}
 }
+
+$('#collection').show()
+$('#queue').hide()
+$('#upload').hide()
+
+document.getElementById("btnradio1").addEventListener("click", function() {
+	$('#collection').show()
+	$('#queue').hide()
+	$('#upload').hide()
+})
+
+document.getElementById("btnradio2").addEventListener("click", function() {
+	$('#collection').hide()
+	$('#queue').show()
+	$('#upload').hide()
+})
+
+document.getElementById("btnradio3").addEventListener("click", function() {
+	$('#collection').hide()
+	$('#queue').hide()
+	$('#upload').show()
+})
