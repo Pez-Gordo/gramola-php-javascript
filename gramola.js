@@ -1,3 +1,11 @@
+// Global Variables
+
+const canvas = document.getElementById('canvas1')
+const ctx = canvas.getContext('2d')
+let audioSource
+let analyzer
+
+
 var canciones
 // Implementamos carga dinámica de archivos 
 $.ajax({
@@ -46,16 +54,17 @@ var listadoMusica= document.getElementById('listadoMusica')
 // Evento para reproducir cancion al hacer clic. Cambiar por añadir a la cola
 listadoMusica.onclick = (e) =>{
 	const itemClick = e.target
-	removeActive()
-	itemClick.classList.add("active");
-	reproduccionActual("Playing: "+ itemClick.innerText)
-	loadMusic(itemClick.innerText)
-	player.play()
-	indiceActual[0]= e.target.id
-	classIconPlay();
+	removeActive() // --> Quita la cancion actual
+	itemClick.classList.add("active"); // --> Añade la clase active al elemento de la lista que ha sido clicado
+	reproduccionActual("Playing: "+ itemClick.innerText) // --> Actualiza el banner con la cancion que se ha pinchado
+	loadMusic(itemClick.innerText) // --> Carga la cancion que se ha pinchado
+	player.play() // --> Comienza a reproducir
+	indiceActual[0]= e.target.id // --> Actualiza el indice
+	classIconPlay(); // --> Cambia el icono
 
 }
 //Funcion para cambiar el icono del reprodutor
+
 function classIconPlay(){
 	var element = document.getElementById("iconPlay")
 	element.classList.remove("fa-play-circle");
@@ -183,5 +192,48 @@ function secondsToString(seconds) {
   second = (second < 10)? '0' + second : second;
   return hour  + minute + ':' + second;
 }
-loadMusic(canciones[0])
+loadMusic(canciones[0]) // --> Carga la cancion que esté en el primer puesto de la lista
 
+player.addEventListener('playing', oscillate)
+
+function oscillate() {
+	//const audio1 = document.getElementById('player')
+	
+	const audioContext = new AudioContext()
+	audioSource = audioContext.createMediaElementSource(player)
+	analyzer = audioContext.createAnalyser()
+	audioSource.connect(analyzer)
+	analyzer.connect(audioContext.destination)
+	analyzer.fftSize = 512
+	const bufferLength = analyzer.frequencyBinCount*0.42
+	const dataArray = new Uint8Array(bufferLength)
+
+	const barWidth = canvas.width / bufferLength
+	let barHeight
+	let x
+	function animate() {
+		x = 0
+		ctx.clearRect(0, 0, canvas.width, canvas.height)
+		analyzer.getByteFrequencyData(dataArray)
+
+		drawVisualizer(bufferLength, x, barWidth, barHeight, dataArray) 
+
+		requestAnimationFrame(animate)
+
+	}
+	animate()
+}
+
+function drawVisualizer(bufferLength, x, barWidth, barHeight, dataArray) {
+	for (let i = 0; i < bufferLength; i++) {
+		barHeight = dataArray[i] -60
+		
+		const hue = i
+		ctx.fillStyle = 'white'
+		ctx.fillRect(x, canvas.height - barHeight +50, barWidth, barHeight)
+		ctx.fillStyle = 'hsl(' + hue + ', 100%, 50%)'
+		
+		ctx.fillRect(x, canvas.height - barHeight +60, barWidth, barHeight)
+		x += barWidth
+	}
+}
