@@ -4,10 +4,9 @@ const canvas = document.getElementById('canvas1')
 const ctx = canvas.getContext('2d')
 let audioSource
 let analyzer
-
-
 var canciones
-// Implementamos carga dinámica de archivos 
+
+// Implementamos carga dinámica de archivos segun el contenido del directorio audio. Desactivo el modo asíncrono para evitar errores en la consola
 $.ajax({
 	async: false,
     url: './listado-archivos.php',
@@ -22,18 +21,6 @@ $.ajax({
     }
 })
 
-
-
-
-
-//Array con el listado de canciones a mostrar en el reprodutor
-/*
-const canciones = [
-	"aaa.mp3",
-	"bbb.mp3",
-	"ccc.mp3"
-]
-*/
 var indiceActual = new Array(1)
 //Funcion para crear mediante javascript el listado de canciones
 function crearPlayList(){
@@ -60,25 +47,27 @@ listadoMusica.onclick = (e) =>{
 	loadMusic(itemClick.innerText) // --> Carga la cancion que se ha pinchado
 	player.play() // --> Comienza a reproducir
 	indiceActual[0]= e.target.id // --> Actualiza el indice
-	classIconPlay(); // --> Cambia el icono
+	classIconPlay(); // --> Cambia el icono play/pause
 
 }
-//Funcion para cambiar el icono del reprodutor
 
+//Funcion para cambiar el icono del reprodutor
 function classIconPlay(){
 	var element = document.getElementById("iconPlay")
 	element.classList.remove("fa-play-circle");
     element.classList.add("fa-pause-circle");
 }
+
 //Funcion para control del volumen
 const volumen= document.getElementById("volumen")
 volumen.oninput= (e) =>{
 	const vol = e.target.value
 	player.volume =vol
 }
+
 //Funcion para actualizar la barra de progreso del reprodutor
-const updateProgress = () =>{
-	if (player.currentTime >0){
+const updateProgress = () => {
+	if (player.currentTime > 0) {
 		const barra = document.getElementById('progress')
 		barra.value = (player.currentTime / player.duration) * 100
 		
@@ -90,11 +79,12 @@ const updateProgress = () =>{
 		duracion= actual +' / '+ dura
 		document.getElementById('timer').innerText=duracion 
 	}
-	if (player.ended){
+	if (player.ended) {
 		// if(lista) {nextMusicList()} else
-		nextMusic();//Reproducir la siguiente pista
+		nextRandomMusic();//Reproducir la siguiente pista
 	} 
 }
+
 //Funcion para reproducir la proxima cancion
 function nextMusic(){  
 	const source = document.getElementById('source');
@@ -113,6 +103,7 @@ function nextMusic(){
 	reproduccionActual("Playing: "+ canciones[siguiente])
 	classIconPlay()
 }
+
 //Funcion para reproducir la cancion anterior
 function prevMusic(){  
 	const source = document.getElementById('source');
@@ -131,6 +122,38 @@ function prevMusic(){
 	reproduccionActual("Reproduciendo: "+ canciones[anterior])
 	classIconPlay()
 }
+
+//Funcion para reproducir la proxima cancion
+function nextRandomMusic(){  
+	
+	var siguiente = Math.floor(Math.random() * canciones.length)// random number
+	
+	removeActive()
+	var item=document.getElementById(siguiente)
+	item.classList.add("active");
+	loadMusic(canciones[siguiente]);
+	player.play()
+	indiceActual[0] = siguiente
+	reproduccionActual("Playing: "+ canciones[siguiente])
+	classIconPlay()
+}
+
+//Funcion para reproducir la cancion anterior
+function prevRandomMusic(){  
+
+	var siguiente = Math.floor(Math.random() * canciones.length)// random number
+
+	
+	removeActive()
+	var item=document.getElementById(anterior)
+	item.classList.add("active");
+	loadMusic(canciones[anterior]);
+	player.play()
+	indiceActual[0]= anterior
+	reproduccionActual("Reproduciendo: "+ canciones[anterior])
+	classIconPlay()
+}
+
 //Funcion para remover todas las clases css activas
 function removeActive(){
 	var elems = document.querySelectorAll(".active");
@@ -165,12 +188,14 @@ function togglePlay() {
 		return player.pause();
 	}
 }
+
 //Funcion para cambiar el icono play o pause
 function toggleIcon() {
    var element = document.getElementById("iconPlay");
    element.classList.toggle("fa-play-circle");
    element.classList.toggle("fa-pause-circle");
 }
+
 //Funcion para que al dar click sobre la barra de progeso se permita adelantar
 progress.addEventListener('click', adelantar);
 function adelantar(e){
@@ -178,6 +203,7 @@ function adelantar(e){
 	player.currentTime = scrubTime;
 	console.log(e);
 }
+
 //Funcion para convertir segundos a minutos y horas
 function secondsToString(seconds) {
 	var hour="";
@@ -192,8 +218,13 @@ function secondsToString(seconds) {
   second = (second < 10)? '0' + second : second;
   return hour  + minute + ':' + second;
 }
-loadMusic(canciones[0]) // --> Carga la cancion que esté en el primer puesto de la lista
 
+//loadMusic(canciones[0]) // --> Carga la cancion que esté en el primer puesto de la lista
+loadMusic(canciones[Math.floor(Math.random() * canciones.length)]) // --> Inicializa el reproductor con una cancion al azar
+
+
+
+// Implementando el visualizador de sonido
 player.addEventListener('playing', oscillate)
 
 function oscillate() {
