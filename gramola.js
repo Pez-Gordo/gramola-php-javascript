@@ -41,7 +41,9 @@ function crearPlayList(){
 }
 document.getElementById('playList').appendChild(crearPlayList())
 
+
 var listadoMusica= document.getElementById('listadoMusica')
+// Evento para reproducir cancion al hacer clic. Cambiar por añadir a la cola
 listadoMusica.onclick = (e) =>{
 	const itemClick = e.target
 	removeActive()
@@ -56,8 +58,8 @@ listadoMusica.onclick = (e) =>{
 //Funcion para cambiar el icono del reprodutor
 function classIconPlay(){
 	var element = document.getElementById("iconPlay")
-	element.classList.remove("fa-pause-circle");
-    element.classList.add("fa-play-circle");
+	element.classList.remove("fa-play-circle");
+    element.classList.add("fa-pause-circle");
 }
 //Funcion para control del volumen
 const volumen= document.getElementById("volumen")
